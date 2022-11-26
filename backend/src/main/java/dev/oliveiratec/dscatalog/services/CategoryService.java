@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dev.oliveiratec.dscatalog.dto.CategoryDTO;
 import dev.oliveiratec.dscatalog.entities.Category;
 import dev.oliveiratec.dscatalog.repositories.CategoryRepository;
-import dev.oliveiratec.dscatalog.services.exceptions.EntityNotFoundException;
+import dev.oliveiratec.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @Service
 public class CategoryService implements Serializable {
@@ -40,5 +42,18 @@ public class CategoryService implements Serializable {
 		entity.setName(dto.getName());
 		entity = repository.save(entity);
 		return new CategoryDTO(entity);
+	}
+
+	@Transactional
+	public CategoryDTO update(Long id, CategoryDTO dto) {
+		try {
+			Category entity = repository.getOne(id);
+			entity.setName(dto.getName());
+			entity = repository.save(entity);
+			return new CategoryDTO(entity);
+		}
+		catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException("Id não encontrado" + id);
+		}
 	}
 }
