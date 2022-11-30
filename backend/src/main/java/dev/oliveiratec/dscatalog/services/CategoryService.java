@@ -35,7 +35,7 @@ public class CategoryService implements Serializable {
 	@Transactional(readOnly = true)
 	public CategoryDTO findByid(Long id) {
 		Optional<Category> obj = repository.findById(id);
-		Category entity = obj.orElseThrow(() -> new EntityNotFoundException("Id não encontrado"));
+		Category entity = obj.orElseThrow(() -> new ResourceNotFoundException("Id não encontrado"));
  		return new CategoryDTO(entity);
 	}
 
