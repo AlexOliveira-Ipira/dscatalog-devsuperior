@@ -34,13 +34,13 @@ public class CategoryResource {
 	
 	@GetMapping(value="/{id}")
 	public ResponseEntity<CategoryDTO> findbyId(@PathVariable Long id){
-		CategoryDTO dto = service.findByid(id);		
+		CategoryDTO dto = service.findById(id);
 		return ResponseEntity.ok().body(dto);	
 	}
 	
 	@PostMapping
 	public ResponseEntity<CategoryDTO> insert(@RequestBody CategoryDTO dto){
-		dto = service.inster(dto);
+		dto = service.insert(dto);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(dto.getId()).toUri();
 		return ResponseEntity.created(uri).body(dto);	
 	}

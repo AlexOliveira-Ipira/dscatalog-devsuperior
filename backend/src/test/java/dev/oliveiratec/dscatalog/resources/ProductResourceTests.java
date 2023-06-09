@@ -3,6 +3,7 @@ package dev.oliveiratec.dscatalog.resources;
 import dev.oliveiratec.dscatalog.dto.ProductDTO;
 import dev.oliveiratec.dscatalog.factory.Factory;
 import dev.oliveiratec.dscatalog.services.ProductService;
+import dev.oliveiratec.dscatalog.services.exceptions.DatabaseException;
 import dev.oliveiratec.dscatalog.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +19,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,11 +38,14 @@ public class ProductResourceTests {
     private long existingId;
     private long nonExistingId;
 
+    private long dependentId;
+
     @BeforeEach
     void setUp() throws Exception{
 
         existingId = 1L;
         nonExistingId = 2L;
+        dependentId = 3L;
 
         productDTO = Factory.creatProductDTO();
         page = new PageImpl<>(List.of(productDTO));
@@ -50,6 +54,10 @@ public class ProductResourceTests {
 
         when(service.findByid(existingId)).thenReturn(productDTO);
         when(service.findByid(nonExistingId)).thenThrow(ResourceNotFoundException.class);
+
+        doNothing().when(service).delete(existingId);
+        doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
+        doThrow(DatabaseException.class).when(service).delete(dependentId);
     }
 
     @Test
@@ -77,6 +85,7 @@ public class ProductResourceTests {
 
         result.andExpect(status().isNotFound());
     }
+
 
 
 }
