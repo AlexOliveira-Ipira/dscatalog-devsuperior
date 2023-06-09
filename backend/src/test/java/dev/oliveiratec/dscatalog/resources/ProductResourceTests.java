@@ -20,8 +20,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProductResource.class)
@@ -61,10 +60,44 @@ public class ProductResourceTests {
         when(service.update(eq(existingId), any())).thenReturn(productDTO);
         when(service.update(eq(nonExistingId), any())).thenThrow(ResourceNotFoundException.class);
 
+        when(service.inster(any())).thenReturn(productDTO);
+
         doNothing().when(service).delete(existingId);
         doThrow(ResourceNotFoundException.class).when(service).delete(nonExistingId);
         doThrow(DatabaseException.class).when(service).delete(dependentId);
     }
+
+    @Test
+    public void deleteShouldReturnNoContentWhenIdExists() throws Exception{
+        ResultActions result = mockMvc.perform(delete("/products/{id}", existingId)
+                .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void deleteShouldReturnNotFoundWhenIdDoesNotExists() throws Exception{
+        ResultActions result = mockMvc.perform(delete("/products/{id}", nonExistingId)
+                .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isNotFound());
+    }
+
+
+
+    @Test
+    public void insertShouldReturnProductDTOCreated() throws Exception{
+
+        String jsonBody = objectMapper.writeValueAsString(productDTO);
+
+        ResultActions result = mockMvc.perform(post("/products")
+                .content(jsonBody)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+
+        result.andExpect(status().isCreated());
+    }
+
 
     @Test
     public void updateShouldReturnProductDTOWhenIdExists() throws Exception{
