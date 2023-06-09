@@ -1,6 +1,7 @@
 package dev.oliveiratec.dscatalog.services;
 
 import dev.oliveiratec.dscatalog.repositories.ProductRepository;
+import dev.oliveiratec.dscatalog.services.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,15 @@ public class ProductServiceTests {
 
         Mockito.doThrow(EmptyResultDataAccessException.class).when(repository).deleteById(nonExistingId);
 
+    }
+    @Test
+    public void deleteShouldThrowResourceNotFoundExceptionWhenIdNotExist(){
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
+            service.delete(nonExistingId);
+        });
+
+        Mockito.verify(repository).deleteById(nonExistingId);
     }
     @Test
     public void deleteShouldDoNothingWhenIdExists(){
