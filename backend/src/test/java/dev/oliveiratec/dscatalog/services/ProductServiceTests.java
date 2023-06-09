@@ -48,7 +48,7 @@ public class ProductServiceTests {
     ProductDTO productDTO;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setUp() throws Exception {
         existingId = 1L;
         nonExistingId = 1000L;
         dependentId = 4L;
